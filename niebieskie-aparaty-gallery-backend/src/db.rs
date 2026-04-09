@@ -15,8 +15,9 @@ pub async fn find_event_by_token_id(
     let result = client
         .scan()
         .table_name(table_name)
-        .filter_expression("tokenId = :tokenId")
+        .filter_expression("tokenId = :tokenId AND camelGallery = :camelGallery")
         .expression_attribute_values(":tokenId", AttributeValue::S(token_id.to_string()))
+        .expression_attribute_values(":camelGallery", AttributeValue::Bool(true))
         .send()
         .await
         .map_err(|e| AppError::DynamoDb(e.into()))?;
@@ -72,6 +73,7 @@ pub async fn find_galleries_by_event_id(
         }
     }
 
+    items.sort_by(|a, b| a.file_name.cmp(&b.file_name));
     debug!(total_count = items.len(), "DynamoDB Query completed");
     Ok(items)
 }
@@ -113,26 +115,23 @@ fn parse_event(item: HashMap<String, AttributeValue>) -> Result<Event, AppError>
             .map(|s| s.to_string())
     };
 
-    let get_bool = |key: &str| -> Result<bool, AppError> {
-        item.get(key)
-            .and_then(|v| v.as_bool().ok())
-            .copied()
-            .ok_or_else(|| AppError::Internal(format!("Missing or invalid field: {key}")))
+    let get_opt_bool = |key: &str| -> Option<bool> {
+        item.get(key).and_then(|v| v.as_bool().ok()).copied()
     };
 
     Ok(Event {
         event_id: get_s("eventId")?,
-        camel_gallery: get_bool("camelGallery")?,
+        camel_gallery: get_opt_bool("camelGallery"),
         created_at: get_s("createdAt")?,
         date: get_s("date")?,
         description: get_opt_s("description"),
         gallery_id: get_opt_s("galleryId"),
-        image_placeholder_object_key: get_s("imagePlaceholderObjectKey")?,
-        selection_available: get_bool("selectionAvailable")?,
+        image_placeholder_object_key: get_opt_s("imagePlaceholderObjectKey"),
+        selection_available: get_opt_bool("selectionAvailable"),
         title: get_s("title")?,
-        token_id: get_s("tokenId")?,
-        token_id_created_at: get_s("tokenIdCreatedAt")?,
-        token_id_valid_days: get_s("tokenIdValidDays")?,
+        token_id: get_opt_s("tokenId"),
+        token_id_created_at: get_opt_s("tokenIdCreatedAt"),
+        token_id_valid_days: get_opt_s("tokenIdValidDays"),
         username: get_s("username")?,
     })
 }

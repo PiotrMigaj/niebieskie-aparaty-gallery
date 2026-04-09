@@ -21,16 +21,16 @@ pub struct GalleryItem {
 #[serde(rename_all = "camelCase")]
 pub struct Event {
     pub event_id: String,
-    pub camel_gallery: bool,
+    pub camel_gallery: Option<bool>,
     pub created_at: String,
     pub date: String,
     pub description: Option<String>,
     pub gallery_id: Option<String>,
-    pub image_placeholder_object_key: String,
-    pub selection_available: bool,
+    pub image_placeholder_object_key: Option<String>,
+    pub selection_available: Option<bool>,
     pub title: String,
-    pub token_id: String,
-    pub token_id_created_at: String,
-    pub token_id_valid_days: String,
+    pub token_id: Option<String>,
+    pub token_id_created_at: Option<String>,
+    pub token_id_valid_days: Option<String>,
     pub username: String,
 }

@@ -32,13 +32,15 @@ pub async fn get_event(
 
     info!(event_id = %event.event_id, username = %event.username, "Event found");
 
-    let created_at = NaiveDate::parse_from_str(&event.token_id_created_at, "%Y-%m-%d")
-        .map_err(|e| AppError::Internal(format!("Invalid tokenIdCreatedAt: {e}")))?;
+    let created_at = event.token_id_created_at.as_deref()
+        .ok_or_else(|| AppError::Internal("Missing tokenIdCreatedAt".to_string()))
+        .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d")
+            .map_err(|e| AppError::Internal(format!("Invalid tokenIdCreatedAt: {e}"))))?;
 
-    let valid_days: i64 = event
-        .token_id_valid_days
-        .parse()
-        .map_err(|e| AppError::Internal(format!("Invalid tokenIdValidDays: {e}")))?;
+    let valid_days: i64 = event.token_id_valid_days.as_deref()
+        .ok_or_else(|| AppError::Internal("Missing tokenIdValidDays".to_string()))
+        .and_then(|s| s.parse()
+            .map_err(|e| AppError::Internal(format!("Invalid tokenIdValidDays: {e}"))))?;
 
     let expiry = created_at + chrono::Duration::days(valid_days);
     let today = chrono::Utc::now().date_naive();
