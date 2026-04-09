@@ -1,0 +1,73 @@
+/* Skeleton loading animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #d1d5db 50%,
+    #e5e7eb 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Masonry column widths — masonry-layout reads these via CSS */
+.masonry-sizer,
+.masonry-item {
+  width: 100%; /* 1 col mobile */
+}
+
+@media (min-width: 768px) {
+  .masonry-sizer,
+  .masonry-item {
+    width: calc(50% - 8px); /* 2 cols, 16px gutter */
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-sizer,
+  .masonry-item {
+    width: calc(33.333% - 10.667px); /* 3 cols, 16px gutter */
+  }
+}
+
+/* masonry-layout stamps position: absolute on items */
+.masonry-item {
+  position: absolute;
+  margin-bottom: 16px; /* vertical gap between rows, matches horizontal gutter */
+  transition: opacity 500ms ease;
+}
+
+/* Image inside masonry item */
+.masonry-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 500ms ease;
+}
+
+/* Navbar hover underline (matching original) */
+nav a:hover,
+nav button:hover {
+  text-decoration: underline;
+}
+
+/* Smooth lightbox open */
+#lightbox {
+  animation: fadeIn 150ms ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Prevent body scroll when lightbox is open */
+body.lightbox-open {
+  overflow: hidden;
+}

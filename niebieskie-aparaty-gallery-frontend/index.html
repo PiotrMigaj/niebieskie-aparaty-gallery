@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Niebieskie Aparaty - Galeria</title>
+
+  <!-- Google Fonts: Italiana -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&display=swap" rel="stylesheet" />
+
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          maxWidth: {
+            '8xl': '88rem',
+          },
+          fontFamily: {
+            italiana: ['Italiana', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="min-h-screen bg-gray-50">
+
+  <!-- Access Denied -->
+  <div id="access-denied" class="hidden min-h-screen flex items-center justify-center">
+    <div class="text-center px-6">
+      <div class="mb-6">
+        <i class="fa-solid fa-lock text-gray-300 text-6xl"></i>
+      </div>
+      <h1 class="text-2xl font-semibold text-gray-700 mb-2">Brak dostępu</h1>
+      <p class="text-gray-500">Link do galerii jest nieprawidłowy lub wygasł.</p>
+    </div>
+  </div>
+
+  <!-- Gallery App -->
+  <div id="app" class="hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full bg-white bg-opacity-95 shadow-sm z-40">
+      <div class="container mx-auto px-4 lg:px-8">
+        <div class="flex justify-between items-center h-[76px]">
+          <!-- Brand -->
+          <span class="font-italiana text-[1.8rem] tracking-[2px]">NIEBIESKIE APARATY</span>
+
+          <!-- Desktop: photo count -->
+          <div class="hidden lg:flex items-center gap-4">
+            <span id="gallery-meta" class="uppercase text-[0.8rem] tracking-[1.5px] font-medium text-gray-500"></span>
+          </div>
+
+          <!-- Mobile toggle -->
+          <button id="mobile-menu-btn" class="lg:hidden focus:outline-none" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars text-black text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-lg pb-4">
+        <div class="container mx-auto px-4">
+          <div class="py-3 border-b border-gray-100">
+            <span id="gallery-meta-mobile" class="uppercase text-[0.8rem] tracking-[1.5px] font-medium text-gray-500"></span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content (pt matches navbar height 76px) -->
+    <main class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8 pt-[100px] pb-12">
+      <!-- Loading state -->
+      <div id="loading-state" class="py-20 text-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-gray-400 text-3xl"></i>
+        <p class="mt-4 text-gray-500 text-sm">Ładowanie galerii...</p>
+      </div>
+
+      <!-- Event header -->
+      <div id="event-header" class="hidden text-center mb-10">
+        <h1 id="event-title" class="font-italiana text-3xl tracking-widest text-gray-800 mb-2"></h1>
+        <p id="event-date" class="text-xs uppercase tracking-[2px] text-gray-400"></p>
+      </div>
+
+      <!-- Gallery container (absolute positioned items) -->
+      <div id="gallery-container" class="hidden relative w-full"></div>
+    </main>
+
+    <footer class="border-t border-gray-200 mt-8">
+      <div class="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-xs tracking-widest uppercase text-gray-400">© 2025 niebieskie-aparaty.pl</span>
+        <div class="flex items-center gap-4">
+          <a href="https://www.facebook.com/people/Anna-Migaj/100001562507926/?_rdr" target="_blank" rel="noopener" aria-label="Facebook"
+             class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fa-brands fa-facebook text-lg"></i>
+          </a>
+          <a href="https://www.instagram.com/niebieskie_aparaty/" target="_blank" rel="noopener" aria-label="Instagram"
+             class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fa-brands fa-instagram text-lg"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" aria-hidden="true" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <!-- Close button -->
+      <button id="lightbox-close" class="lightbox-close absolute top-4 right-4 text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <!-- Download button -->
+      <button id="lightbox-download" class="lightbox-download absolute top-4 right-16 bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full shadow-lg transition-all duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-download text-sm"></i>
+        <i id="lightbox-download-spinner" class="fa-solid fa-circle-notch fa-spin text-sm hidden"></i>
+      </button>
+
+      <!-- Counter -->
+      <div id="lightbox-counter" class="lightbox-counter absolute top-4 left-4 text-white/60 text-sm"></div>
+
+      <!-- Image area with navigation -->
+      <div class="flex items-center gap-4 max-w-[95vw] max-h-screen">
+        <!-- Prev arrow (desktop) -->
+        <button id="lightbox-prev" class="lightbox-prev hidden md:flex text-white/60 hover:text-white transition-colors w-12 h-12 items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0">
+          <i class="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+
+        <!-- Image wrapper -->
+        <div class="flex items-center justify-center">
+          <div id="lightbox-img-skeleton" class="lightbox-img-skeleton skeleton rounded-lg" style="width: 400px; height: 300px;"></div>
+          <img id="lightbox-img" src="" alt="" class="lightbox-img max-w-[90vw] max-h-[80vh] md:max-h-[85vh] object-contain rounded-lg hidden transition-opacity duration-300" />
+        </div>
+
+        <!-- Next arrow (desktop) -->
+        <button id="lightbox-next" class="lightbox-next hidden md:flex text-white/60 hover:text-white transition-colors w-12 h-12 items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0">
+          <i class="fa-solid fa-chevron-right text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile navigation -->
+      <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-8 md:hidden">
+        <button id="lightbox-prev-mobile" class="lightbox-prev-mobile text-white/70 hover:text-white transition-colors w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20">
+          <i class="fa-solid fa-chevron-left text-xl"></i>
+        </button>
+        <button id="lightbox-next-mobile" class="lightbox-next-mobile text-white/70 hover:text-white transition-colors w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20">
+          <i class="fa-solid fa-chevron-right text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu toggle script (inline, no module needed) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('mobile-menu-btn')
+      const menu = document.getElementById('mobile-menu')
+      if (btn && menu) {
+        btn.addEventListener('click', () => {
+          menu.classList.toggle('hidden')
+        })
+      }
+    })
+  </script>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

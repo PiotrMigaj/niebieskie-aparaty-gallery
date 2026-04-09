@@ -1,0 +1,33 @@
+services:
+  gallery-backend:
+    build: ./niebieskie-aparaty-gallery-backend
+    image: migi987/niebieskie-aparaty-gallery-backend:1.0
+    ports:
+      - "3501:4000"
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - EVENTS_TABLE_NAME=${EVENTS_TABLE_NAME}
+      - GALLERIES_TABLE_NAME=${GALLERIES_TABLE_NAME}
+      - PORT=4000
+      - RATE_LIMITING=${RATE_LIMITING}
+      - RUST_LOG=info
+    restart: unless-stopped
+    networks:
+      - gallery-net
+
+  gallery-frontend:
+    build: ./niebieskie-aparaty-gallery-frontend
+    image: migi987/niebieskie-aparaty-gallery-frontend:1.0
+    ports:
+      - "3500:80"
+    restart: unless-stopped
+    networks:
+      - gallery-net
+    depends_on:
+      - gallery-backend
+
+networks:
+  gallery-net:
+    driver: bridge

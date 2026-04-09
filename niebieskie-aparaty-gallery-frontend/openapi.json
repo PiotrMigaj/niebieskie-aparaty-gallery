@@ -1,0 +1,258 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Niebieskie Aparaty Gallery API",
+    "description": "API for retrieving photography events and gallery items",
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/event/{tokenId}": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "operationId": "get_event",
+        "parameters": [
+          {
+            "name": "tokenId",
+            "in": "path",
+            "description": "Time-limited access token for the event",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Token expired",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                },
+                "example": {
+                  "error": "Token has expired"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                },
+                "example": {
+                  "error": "Event not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                },
+                "example": {
+                  "error": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gallery/{eventId}": {
+      "get": {
+        "tags": [
+          "gallery"
+        ],
+        "operationId": "get_gallery",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "description": "Unique identifier of the event",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gallery items returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GalleryItem"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                },
+                "example": {
+                  "error": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Event": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "camelGallery",
+          "createdAt",
+          "date",
+          "imagePlaceholderObjectKey",
+          "selectionAvailable",
+          "title",
+          "tokenId",
+          "tokenIdCreatedAt",
+          "tokenIdValidDays",
+          "username"
+        ],
+        "properties": {
+          "camelGallery": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "galleryId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imagePlaceholderObjectKey": {
+            "type": "string"
+          },
+          "selectionAvailable": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          },
+          "tokenId": {
+            "type": "string"
+          },
+          "tokenIdCreatedAt": {
+            "type": "string"
+          },
+          "tokenIdValidDays": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "GalleryItem": {
+        "type": "object",
+        "required": [
+          "fileName",
+          "eventId",
+          "compressedFileHeight",
+          "compressedFileName",
+          "compressedFileObjectKey",
+          "compressedFilePresignedUrl",
+          "compressedFileWidth",
+          "originalFileObjectKey",
+          "originalFilePresignedUrl",
+          "presignDateTime",
+          "username"
+        ],
+        "properties": {
+          "compressedFileHeight": {
+            "type": "string"
+          },
+          "compressedFileName": {
+            "type": "string"
+          },
+          "compressedFileObjectKey": {
+            "type": "string"
+          },
+          "compressedFilePresignedUrl": {
+            "type": "string"
+          },
+          "compressedFileWidth": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "originalFileObjectKey": {
+            "type": "string"
+          },
+          "originalFilePresignedUrl": {
+            "type": "string"
+          },
+          "presignDateTime": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "events",
+      "description": "Event lookup by access token"
+    },
+    {
+      "name": "gallery",
+      "description": "Gallery photo retrieval"
+    }
+  ]
+}
