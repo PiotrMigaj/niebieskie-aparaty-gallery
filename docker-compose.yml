@@ -1,7 +1,7 @@
 services:
   gallery-backend:
     build: ./niebieskie-aparaty-gallery-backend
-    image: migi987/niebieskie-aparaty-gallery-backend:2.0
+    image: migi987/niebieskie-aparaty-gallery-backend:3.0
     ports:
       - "3501:4000"
     environment:
@@ -19,7 +19,7 @@ services:
 
   gallery-frontend:
     build: ./niebieskie-aparaty-gallery-frontend
-    image: migi987/niebieskie-aparaty-gallery-frontend:2.0
+    image: migi987/niebieskie-aparaty-gallery-frontend:3.0
     ports:
       - "3500:80"
     restart: unless-stopped
