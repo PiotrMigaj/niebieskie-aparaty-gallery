@@ -15,6 +15,11 @@
   100% { background-position: -200% 0; }
 }
 
+/* Custom elements default to display:inline — override for layout correctness */
+gallery-grid {
+  display: block;
+}
+
 /* Masonry column widths — masonry-layout reads these via CSS */
 .masonry-sizer,
 .masonry-item {

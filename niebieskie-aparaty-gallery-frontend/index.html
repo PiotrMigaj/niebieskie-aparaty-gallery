@@ -94,7 +94,7 @@
       </div>
 
       <!-- Gallery container (absolute positioned items) -->
-      <div id="gallery-container" class="hidden relative w-full"></div>
+      <gallery-grid id="gallery-container" class="hidden relative w-full"></gallery-grid>
     </main>
 
     <footer class="border-t border-gray-200 mt-8">
@@ -115,52 +115,7 @@
   </div>
 
   <!-- Lightbox -->
-  <div id="lightbox" aria-hidden="true" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden">
-    <div class="absolute inset-0 flex items-center justify-center">
-      <!-- Close button -->
-      <button id="lightbox-close" class="lightbox-close absolute top-4 right-4 text-white/70 hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
-
-      <!-- Download button -->
-      <button id="lightbox-download" class="lightbox-download absolute top-4 right-16 bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full shadow-lg transition-all duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-download text-sm"></i>
-        <i id="lightbox-download-spinner" class="fa-solid fa-circle-notch fa-spin text-sm hidden"></i>
-      </button>
-
-      <!-- Counter -->
-      <div id="lightbox-counter" class="lightbox-counter absolute top-4 left-4 text-white/60 text-sm"></div>
-
-      <!-- Image area with navigation -->
-      <div class="flex items-center gap-4 max-w-[95vw] max-h-screen">
-        <!-- Prev arrow (desktop) -->
-        <button id="lightbox-prev" class="lightbox-prev hidden md:flex text-white/60 hover:text-white transition-colors w-12 h-12 items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0">
-          <i class="fa-solid fa-chevron-left text-xl"></i>
-        </button>
-
-        <!-- Image wrapper -->
-        <div class="flex items-center justify-center">
-          <div id="lightbox-img-skeleton" class="lightbox-img-skeleton skeleton rounded-lg" style="width: 400px; height: 300px;"></div>
-          <img id="lightbox-img" src="" alt="" class="lightbox-img max-w-[90vw] max-h-[80vh] md:max-h-[85vh] object-contain rounded-lg hidden transition-opacity duration-300" />
-        </div>
-
-        <!-- Next arrow (desktop) -->
-        <button id="lightbox-next" class="lightbox-next hidden md:flex text-white/60 hover:text-white transition-colors w-12 h-12 items-center justify-center rounded-full hover:bg-white/10 flex-shrink-0">
-          <i class="fa-solid fa-chevron-right text-xl"></i>
-        </button>
-      </div>
-
-      <!-- Mobile navigation -->
-      <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-8 md:hidden">
-        <button id="lightbox-prev-mobile" class="lightbox-prev-mobile text-white/70 hover:text-white transition-colors w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20">
-          <i class="fa-solid fa-chevron-left text-xl"></i>
-        </button>
-        <button id="lightbox-next-mobile" class="lightbox-next-mobile text-white/70 hover:text-white transition-colors w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20">
-          <i class="fa-solid fa-chevron-right text-xl"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+  <photo-lightbox id="lightbox"></photo-lightbox>
 
   <!-- Mobile menu toggle script (inline, no module needed) -->
   <script>

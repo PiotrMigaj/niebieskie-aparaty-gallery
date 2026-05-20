@@ -1,6 +1,14 @@
-import ApiService from './services/ApiService.js'
-import { Gallery } from './gallery.js'
-import { Lightbox } from './lightbox.js'
+import './components/GalleryItem.js'
+import './components/GalleryGrid.js'
+import './components/PhotoLightbox.js'
+import { useEvent } from './composables/useEvent.js'
+import { useGallery } from './composables/useGallery.js'
+
+const ERROR_MESSAGES = {
+  token_expired: 'Link do galerii wygasł.',
+  not_found: 'Nie znaleziono galerii.',
+  server_error: 'Wystąpił błąd serwera. Spróbuj ponownie.',
+}
 
 function getTokenId() {
   const params = new URLSearchParams(window.location.search)
@@ -8,47 +16,58 @@ function getTokenId() {
   return tokenId && tokenId.trim().length > 0 ? tokenId.trim() : null
 }
 
-function showAccessDenied(message) {
+function showAccessDenied(error = null) {
   document.getElementById('app').classList.add('hidden')
   const el = document.getElementById('access-denied')
-  el.querySelector('p').textContent = message
+  if (error) el.querySelector('p').textContent = ERROR_MESSAGES[error] ?? ERROR_MESSAGES.server_error
   el.classList.remove('hidden')
+}
+
+function renderEventMeta(event, imageCount) {
+  const metaText = `${imageCount} zdjęć`
+  document.getElementById('gallery-meta').textContent = metaText
+  document.getElementById('gallery-meta-mobile').textContent = metaText
+  document.getElementById('event-title').textContent = event.title
+  document.getElementById('event-date').textContent = new Date(event.createdAt).toLocaleDateString(
+    'pl-PL',
+    { year: 'numeric', month: 'long', day: 'numeric' }
+  )
+  document.getElementById('event-header').classList.remove('hidden')
+  document.getElementById('loading-state').classList.add('hidden')
+  document.getElementById('gallery-container').classList.remove('hidden')
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   const tokenId = getTokenId()
   if (!tokenId) {
-    document.getElementById('access-denied').classList.remove('hidden')
+    showAccessDenied()
     return
   }
 
   document.getElementById('app').classList.remove('hidden')
 
-  try {
-    const event = await ApiService.fetchEvent(tokenId)
-    const items = await ApiService.fetchGallery(event.eventId)
-    const images = ApiService.mapToImages(items)
+  const { state: eventState, load: loadEvent } = useEvent()
+  await loadEvent(tokenId)
 
-    const metaText = `${images.length} zdjęć`
-    document.getElementById('gallery-meta').textContent = metaText
-    document.getElementById('gallery-meta-mobile').textContent = metaText
-
-    document.getElementById('event-title').textContent = event.title
-    document.getElementById('event-date').textContent = new Date(event.createdAt).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' })
-    document.getElementById('event-header').classList.remove('hidden')
-
-    document.getElementById('loading-state').classList.add('hidden')
-    document.getElementById('gallery-container').classList.remove('hidden')
-
-    const lightbox = new Lightbox(images)
-    const gallery = new Gallery(images, (index) => lightbox.open(index))
-    gallery.init()
-  } catch (err) {
-    const messages = {
-      token_expired: 'Link do galerii wygasł.',
-      not_found: 'Nie znaleziono galerii.',
-      server_error: 'Wystąpił błąd serwera. Spróbuj ponownie.',
-    }
-    showAccessDenied(messages[err.message] || 'Wystąpił błąd serwera. Spróbuj ponownie.')
+  if (eventState.error) {
+    showAccessDenied(eventState.error)
+    return
   }
+
+  const { state: galleryState, load: loadGallery } = useGallery()
+  await loadGallery(eventState.data.eventId)
+
+  if (galleryState.error) {
+    showAccessDenied(galleryState.error)
+    return
+  }
+
+  renderEventMeta(eventState.data, galleryState.images.length)
+
+  const grid = document.querySelector('gallery-grid')
+  const lightbox = document.querySelector('photo-lightbox')
+  lightbox.images = galleryState.images
+
+  grid.addEventListener('gallery-item-click', e => lightbox.show(e.detail.index))
+  grid.addImages(galleryState.images)
 })
