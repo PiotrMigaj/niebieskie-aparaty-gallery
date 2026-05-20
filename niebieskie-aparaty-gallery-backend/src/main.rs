@@ -1,7 +1,11 @@
-mod db;
+// `mod` declares a module that belongs to this crate.
+// Rust looks for the module's code either in `<name>.rs` or `<name>/mod.rs`.
+// Here `mod event` finds `src/event/mod.rs`, and `mod gallery` finds `src/gallery/mod.rs`.
+// We no longer need `mod db` or `mod models` — those are replaced by the new modules.
 mod errors;
+mod event;
+mod gallery;
 mod handlers;
-mod models;
 mod openapi;
 mod rate_limiter;
 
@@ -16,6 +20,9 @@ use axum::{
     routing::get,
     Json, Router,
 };
+// Import the concrete repository structs to instantiate them in `main()`.
+use event::repository::DynamoDbEventRepository;
+use gallery::repository::DynamoDbGalleryRepository;
 use openapi::ApiDoc;
 use rate_limiter::RateLimiter;
 use serde_json::json;
@@ -26,11 +33,18 @@ use tracing_subscriber::{fmt, EnvFilter};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
+// `AppState` is shared across all Axum request handlers via Axum's `State` extractor.
+// Axum requires `AppState` to implement `Clone`, which works here because:
+//   - `Arc<T>` always implements `Clone` (it just increments the reference count)
+//   - The `dyn Trait` objects live behind `Arc`, so they don't need to be `Clone` themselves
 #[derive(Clone)]
 pub struct AppState {
-    pub dynamo_client: Client,
-    pub events_table_name: String,
-    pub galleries_table_name: String,
+    // `Arc` (Atomically Reference Counted) lets multiple handlers share the same repository
+    // instance safely across async tasks without copying the data.
+    // `dyn EventRepository` is a "trait object" — it holds any type that implements
+    // `EventRepository`, chosen at runtime. This is Rust's form of dynamic dispatch.
+    pub event_repo: Arc<dyn event::repository::EventRepository>,
+    pub gallery_repo: Arc<dyn gallery::repository::GalleryRepository>,
     pub rate_limiter: Arc<RateLimiter>,
 }
 
@@ -70,10 +84,21 @@ async fn main() {
         .unwrap_or(100)
         .max(1);
 
-    let state = AppState {
-        dynamo_client,
+    // Instantiate the concrete DynamoDB repositories.
+    // We wrap them in `Arc` so they can be stored as `Arc<dyn Trait>` in AppState.
+    // `dynamo_client.clone()` is cheap — the AWS SDK client is already Arc-wrapped internally.
+    let event_repo = Arc::new(DynamoDbEventRepository::new(
+        dynamo_client.clone(),
         events_table_name,
+    ));
+    let gallery_repo = Arc::new(DynamoDbGalleryRepository::new(
+        dynamo_client,
         galleries_table_name,
+    ));
+
+    let state = AppState {
+        event_repo,
+        gallery_repo,
         rate_limiter: Arc::new(RateLimiter::new(rate_limit)),
     };
 

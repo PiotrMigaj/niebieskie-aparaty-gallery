@@ -24,21 +24,21 @@
 @media (min-width: 768px) {
   .masonry-sizer,
   .masonry-item {
-    width: calc(50% - 8px); /* 2 cols, 16px gutter */
+    width: calc(50% - 4px); /* 2 cols, 8px gutter */
   }
 }
 
 @media (min-width: 1024px) {
   .masonry-sizer,
   .masonry-item {
-    width: calc(33.333% - 10.667px); /* 3 cols, 16px gutter */
+    width: calc(33.333% - 5.333px); /* 3 cols, 8px gutter */
   }
 }
 
 /* masonry-layout stamps position: absolute on items */
 .masonry-item {
   position: absolute;
-  margin-bottom: 16px; /* vertical gap between rows, matches horizontal gutter */
+  margin-bottom: 8px; /* vertical gap between rows, matches horizontal gutter */
   transition: opacity 500ms ease;
 }
 

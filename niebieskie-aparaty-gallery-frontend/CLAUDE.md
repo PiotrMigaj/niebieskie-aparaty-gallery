@@ -36,10 +36,10 @@ Toggled by adding/removing `hidden` class on `#lightbox`. Keyboard handler (ESC/
 ### Styling
 - TailwindCSS via CDN (no build step) with one custom extension: `max-w-8xl: 88rem` and `font-italiana`
 - Font Awesome 6 via CDN
-- `src/style.css` contains: skeleton shimmer animation, masonry column-width responsive rules (the CSS that masonry-layout reads), and `margin-bottom: 16px` on `.masonry-item` for vertical row spacing
+- `src/style.css` contains: skeleton shimmer animation, masonry column-width responsive rules (the CSS that masonry-layout reads), and `margin-bottom: 8px` on `.masonry-item` for vertical row spacing
 
 ### Gap/spacing
-Both horizontal and vertical gaps are **16px**. Horizontal is set via `gutter: 16` in the masonry options. Vertical is set via `margin-bottom: 16px` on `.masonry-item` in CSS. The CSS column widths account for the gutter: `calc(50% - 8px)` for 2 cols, `calc(33.333% - 10.667px)` for 3 cols.
+Both horizontal and vertical gaps are **8px**. Horizontal is set via `gutter: 8` in the masonry options. Vertical is set via `margin-bottom: 8px` on `.masonry-item` in CSS. The CSS column widths account for the gutter: `calc(50% - 4px)` for 2 cols, `calc(33.333% - 5.333px)` for 3 cols.
 
 ### Real API integration
 Mock data has been replaced. Backend runs on port 4000 (`cargo run` in the backend dir). Vite proxy (`vite.config.js`) forwards `/api/*` → `http://localhost:4000` for local dev — no env var needed. Test URL requires a real tokenId from DynamoDB: `http://localhost:3000?tokenId=<real-token>`.

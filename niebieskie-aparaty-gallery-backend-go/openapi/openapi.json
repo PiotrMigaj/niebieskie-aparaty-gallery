@@ -1,0 +1,170 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Niebieskie Aparaty Gallery API",
+    "version": "1.0.0",
+    "description": "API for retrieving photography events and gallery items"
+  },
+  "tags": [
+    { "name": "events",  "description": "Event lookup by access token" },
+    { "name": "gallery", "description": "Gallery photo retrieval" }
+  ],
+  "paths": {
+    "/api/event/{tokenId}": {
+      "get": {
+        "tags": ["events"],
+        "summary": "Get event by access token",
+        "parameters": [
+          {
+            "name": "tokenId",
+            "in": "path",
+            "required": true,
+            "description": "Time-limited access token for the event",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Event" }
+              }
+            }
+          },
+          "400": {
+            "description": "Token expired",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Token has expired" }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Event not found" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Rate limit exceeded" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Internal server error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/gallery/{eventId}": {
+      "get": {
+        "tags": ["gallery"],
+        "summary": "List gallery items for an event",
+        "parameters": [
+          {
+            "name": "eventId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the event",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gallery items returned (sorted by fileName)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/GalleryItem" }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Event": {
+        "type": "object",
+        "required": ["eventId", "createdAt", "date", "title", "username"],
+        "properties": {
+          "eventId":                    { "type": "string" },
+          "camelGallery":               { "type": "boolean", "nullable": true },
+          "createdAt":                  { "type": "string" },
+          "date":                       { "type": "string" },
+          "description":                { "type": "string", "nullable": true },
+          "galleryId":                  { "type": "string", "nullable": true },
+          "imagePlaceholderObjectKey":  { "type": "string", "nullable": true },
+          "selectionAvailable":         { "type": "boolean", "nullable": true },
+          "title":                      { "type": "string" },
+          "tokenId":                    { "type": "string", "nullable": true },
+          "tokenIdCreatedAt":           { "type": "string", "nullable": true },
+          "tokenIdValidDays":           { "type": "string", "nullable": true },
+          "username":                   { "type": "string" }
+        }
+      },
+      "GalleryItem": {
+        "type": "object",
+        "required": [
+          "fileName", "eventId", "compressedFileHeight", "compressedFileName",
+          "compressedFileObjectKey", "compressedFilePresignedUrl", "compressedFileWidth",
+          "originalFileObjectKey", "originalFilePresignedUrl", "presignDateTime", "username"
+        ],
+        "properties": {
+          "fileName":                   { "type": "string" },
+          "eventId":                    { "type": "string" },
+          "compressedFileHeight":       { "type": "string" },
+          "compressedFileName":         { "type": "string" },
+          "compressedFileObjectKey":    { "type": "string" },
+          "compressedFilePresignedUrl": { "type": "string" },
+          "compressedFileWidth":        { "type": "string" },
+          "originalFileObjectKey":      { "type": "string" },
+          "originalFilePresignedUrl":   { "type": "string" },
+          "presignDateTime":            { "type": "string" },
+          "username":                   { "type": "string" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -43,7 +43,7 @@ export class Gallery {
     this.#msnry = new Masonry(this.#container, {
       itemSelector: '.masonry-item',
       columnWidth: '.masonry-sizer',
-      gutter: 16,
+      gutter: 8,
       percentPosition: true,
       transitionDuration: 0,
       resizeContainer: true,

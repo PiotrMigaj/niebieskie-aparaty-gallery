@@ -5,7 +5,14 @@ use axum::{
 use chrono::NaiveDate;
 use tracing::{info, warn};
 
-use crate::{db, errors::AppError, models::{Event, GalleryItem}, AppState};
+// We now import models from their new module paths instead of the old `models` module.
+// `crate::event::model::Event` means: in this crate → event module → model sub-module → Event type.
+use crate::{
+    errors::AppError,
+    event::model::Event,
+    gallery::model::GalleryItem,
+    AppState,
+};
 
 #[utoipa::path(
     get,
@@ -26,7 +33,10 @@ pub async fn get_event(
     State(state): State<AppState>,
     Path(token_id): Path<String>,
 ) -> Result<Json<Event>, AppError> {
-    let event = db::find_event_by_token_id(&state.dynamo_client, &state.events_table_name, &token_id)
+    // Call the repository through the trait interface — no direct DynamoDB code here.
+    // `.find_by_token_id` is dispatched dynamically via the `dyn EventRepository` trait object.
+    let event = state.event_repo
+        .find_by_token_id(&token_id)
         .await?
         .ok_or(AppError::NotFound)?;
 
@@ -72,9 +82,9 @@ pub async fn get_gallery(
     State(state): State<AppState>,
     Path(event_id): Path<String>,
 ) -> Result<Json<Vec<GalleryItem>>, AppError> {
-    let items =
-        db::find_galleries_by_event_id(&state.dynamo_client, &state.galleries_table_name, &event_id)
-            .await?;
+    let items = state.gallery_repo
+        .find_by_event_id(&event_id)
+        .await?;
 
     info!(event_id = %event_id, count = items.len(), "Returning gallery items");
     Ok(Json(items))

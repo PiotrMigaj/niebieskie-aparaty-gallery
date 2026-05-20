@@ -1,6 +1,7 @@
 use utoipa::OpenApi;
 
-use crate::{handlers, models::{Event, GalleryItem}};
+// Import models from their new module paths in the event and gallery modules.
+use crate::{handlers, event::model::Event, gallery::model::GalleryItem};
 
 #[derive(OpenApi)]
 #[openapi(

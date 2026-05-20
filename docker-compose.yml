@@ -1,7 +1,7 @@
 services:
   gallery-backend:
-    build: ./niebieskie-aparaty-gallery-backend
-    image: migi987/niebieskie-aparaty-gallery-backend:4.0
+    build: ./niebieskie-aparaty-gallery-backend-go
+    image: migi987/niebieskie-aparaty-gallery-backend:5.0
     ports:
       - "3501:4000"
     environment:
@@ -12,7 +12,7 @@ services:
       - GALLERIES_TABLE_NAME=${GALLERIES_TABLE_NAME}
       - PORT=4000
       - RATE_LIMITING=${RATE_LIMITING}
-      - RUST_LOG=info
+      - LOG_LEVEL=info
     restart: unless-stopped
     networks:
       - gallery-net
